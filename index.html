@@ -82,6 +82,29 @@
 
         }
 
+        function handleDeleteGoal(goal){
+            return (dispatch) => {
+                dispatch(removeGoalAction(goal.id))
+
+                return API.deleteGoal(goal.id)
+                    .catch(() => {
+                        dispatch(addGoalAction(goal))
+                        alert('Error occured. Please try again')
+                    })
+            }
+        }
+
+        function handleAddGoal(name, cb){
+            return (dispatch) => {
+                return API.saveGoal(name)
+                    .then((goal) =>{
+                        dispatch(addGoalAction(goal))
+                        cb()
+                    })
+                    .catch(() => alert('Error. Try again'))
+            }
+        }
+
         const checker = (store) => (next) => (action) => {
             if (
                 action.type === ADD_TODO &&
@@ -236,23 +259,14 @@
             addItem =(e) => {
                 e.preventDefault()
 
-                return API.saveGoal(this.input.value)
-                    .then((goal) =>{
-                        this.props.store.dispatch(addGoalAction(goal))
-                        this.input.value = ''
-                    })
-                    .catch(() => {
-                        alert('Error. Try again')
-                    })
+                this.props.store.dispatch(handleAddGoal(
+                    this.input.value,
+                    () => this.input.value = ''
+                ))
             }
 
             removeItem = (goal) => {
-                this.props.store.dispatch(removeGoalAction(goal.id))
-                return API.deleteGoal(goal.id)
-                    .catch(() => {
-                        this.props.store.dispatch(addGoalAction(goal))
-                        alert('Error occured. Please try again')
-                    })
+                this.props.store.dispatch(handleDeleteGoal(goal))
             }
 
             render(){
