@@ -3,10 +3,11 @@
 
 <head>
     <title>Todos/Goals</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
     <script src='https://unpkg.com/react@16.3.0-alpha.1/umd/react.development.js'></script>
     <script src='https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js'></script>
     <script src='https://unpkg.com/babel-standalone@6.15.0/babel.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js'></script>
+    <script src='https://tylermcginnis.com/goals-todos-api/index.js'></script>
 </head>
 
 <body>
@@ -24,36 +25,43 @@
         const TOGGLE_TODO = 'TOGGLE_TODO'
         const ADD_GOAL = 'ADD_GOAL'
         const REMOVE_GOAL = 'REMOVE_GOAL'
+        const RECEIVE_DATA = 'RECEIVE_DATA'
+
         function addTodoAction(todo) {
             return {
                 type: ADD_TODO,
                 todo,
             }
         }
+        
         function removeTodoAction(id) {
             return {
                 type: REMOVE_TODO,
                 id,
             }
         }
+
         function toggleTodoAction(id) {
             return {
                 type: TOGGLE_TODO,
                 id,
             }
         }
+
         function addGoalAction(goal) {
             return {
                 type: ADD_GOAL,
                 goal,
             }
         }
+
         function removeGoalAction(id) {
             return {
                 type: REMOVE_GOAL,
                 id,
             }
         }
+
         const checker = (store) => (next) => (action) => {
             if (
                 action.type === ADD_TODO &&
@@ -69,6 +77,7 @@
             }
             return next(action)
         }
+
         const logger = (store) => (next) => (action) => {
             console.group(action.type)
             console.log('The action: ', action)
@@ -77,6 +86,7 @@
             console.groupEnd()
             return result
         }
+
         // Reducer function
         function todos(state = [], action) {
             switch (action.type) {
@@ -89,20 +99,34 @@
                         ? todo
                         : Object.assign({}, todo, { complete: !todo.complete })
                     )
+                case RECEIVE_DATA:
+                    return action.todos
                 default:
                     return state
             }
         }
+
         function goals(state = [], action) {
             switch (action.type) {
                 case ADD_GOAL:
                     return state.concat([action.goal])
                 case REMOVE_GOAL:
                     return state.filter((goal) => goal.id !== action.id)
+                case RECEIVE_DATA:
+                    return action.goals
                 default:
                     return state
             }
         }
+
+        function receiveDataAction(todos, goals){
+            return {
+                type: RECEIVE_DATA,
+                todos,
+                goals,
+            }
+        }
+
         const store = Redux.createStore(Redux.combineReducers({
             todos,
             goals,
@@ -210,6 +234,14 @@
         class App extends React.Component {
             componentDidMount(){
                 const { store } = this.props
+
+                Promise.all([
+                    API.fetchTodos(),
+                    API.fetchGoals(),
+                ]).then(([todos, goals]) =>{
+                    store.dispatch(receiveDataAction(todos, goals))
+                })
+
                 store.subscribe(() => this.forceUpdate())
             }
             render(){
