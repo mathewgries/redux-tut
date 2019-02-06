@@ -33,7 +33,7 @@
                 todo,
             }
         }
-        
+
         function removeTodoAction(id) {
             return {
                 type: REMOVE_TODO,
@@ -119,16 +119,16 @@
             }
         }
 
-        function loading(state = true, action){
-            switch(action.type){
+        function loading(state = true, action) {
+            switch (action.type) {
                 case RECEIVE_DATA:
                     return false
-                default :
+                default:
                     return state
             }
         }
 
-        function receiveDataAction(todos, goals){
+        function receiveDataAction(todos, goals) {
             return {
                 type: RECEIVE_DATA,
                 todos,
@@ -178,6 +178,12 @@
 
             removeItem = (todo) => {
                 this.props.store.dispatch(removeTodoAction(todo.id))
+
+                return API.deleteTodo(todo.id)
+                    .catch(() => {
+                        this.props.store.dispatch(addTodoAction(todo))
+                        alert('Error occurred try again')
+                    })
             }
 
             toggleItem = (id) => {
@@ -219,6 +225,11 @@
 
             removeItem = (goal) => {
                 this.props.store.dispatch(removeGoalAction(goal.id))
+                return API.deleteGoal(goal.id)
+                    .catch(() => {
+                        this.props.store.dispatch(addGoalAction(goal))
+                        alert('Error occured. Please try again')
+                    })
             }
 
             render(){
