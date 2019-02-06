@@ -104,8 +104,9 @@
                 case REMOVE_TODO:
                     return state.filter((todo) => todo.id !== action.id)
                 case TOGGLE_TODO:
-                    return state.map((todo) => todo.id !== action.id ? todo :
-                        Object.assign({}, todo, { complete: !todo.complete })
+                    return state.map((todo) => todo.id !== action.id
+                        ? todo
+                        : Object.assign({}, todo, { complete: !todo.complete })
                     )
                 default:
                     return state
@@ -149,6 +150,7 @@
             node.appendChild(removeBtn)
             node.style.textDecoration = todo.complete ? 'line-through' : 'none'
             node.addEventListener('click', () => {
+                console.log('I am called here')
                 store.dispatch(toggleTodoAction(todo.id))
             })
             document.getElementById('todos')
@@ -230,11 +232,26 @@
 
         
         class Goals extends React.Component {
+            addItem =(e) => {
+                e.preventDefault()
+                const name = this.input.value
+                this.input.value = ''
+
+                this.props.store.dispatch(addGoalAction({
+                    id: generateId(),
+                    name,
+                }))
+            }
             render(){
                 return(
                     <div>
-                        GOALS
-                        
+                        <h1>Goals List</h1>
+                        <input
+                            type='text'
+                            placeholder='Add Goal'
+                            ref={(input) => this.input = input}
+                        />
+                        <button onClick={this.addItem}>Add Goal</button>
                         <List/>
                     </div>
                 )
@@ -247,7 +264,7 @@
                 return(
                     <div>
                         <Todos store={this.props.store}/>
-                        <Goals/>    
+                        <Goals store={this.props.store}/>    
                     </div>
                 )
             }
