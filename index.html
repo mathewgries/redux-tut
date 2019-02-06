@@ -10,17 +10,17 @@
     <div>
         <h1>Todo List</h1>
         <input id="todo" type="text" placeholder="Add Todo" />
-        <button id="todoBtn" >Add Todo</button>
+        <button id="todoBtn">Add Todo</button>
         <ul id="todos">
 
         </ul>
     </div>
     <div>
         <h1>Goals</h1>
-        <input id="goal" type="text" placeholder="Add Goal"/>
+        <input id="goal" type="text" placeholder="Add Goal" />
         <button id="goalBtn">Add Goal</button>
         <ul id="goals">
-            
+
         </ul>
     </div>
 
@@ -31,6 +31,9 @@
             2. They depend only on the arguments passed into them.
             3. Never produce any side effects. (no ajax requests, do not mutate state, no interaction with the DOM (outside world))
         */
+        function generateId() {
+            return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+        }
 
         // Library code - what we would download from npm
         function createStore(reducer) {
@@ -134,7 +137,7 @@
                 case REMOVE_GOAL:
                     return state.filter((goal) => goal.id !== action.id)
                 default:
-                    state
+                    return state
             }
         }
 
@@ -195,6 +198,32 @@
 
         store.dispatch(removeGoalAction(0))
 
+        // DOM code
+
+        function addTodo() {
+            const input = document.getElementById('todo')
+            const name = input.value
+            input.value = ''
+            store.dispatch(addTodoAction({
+                id: generateId(),
+                name,
+                complete: false,
+            }))
+        }
+        function addGoal() {
+            const input = document.getElementById('goal')
+            const name = input.value
+            input.value = ''
+            store.dispatch(addGoalAction({
+                id: generateId(),
+                name,
+            }))
+        }
+
+        document.getElementById('todoBtn')
+            .addEventListener('click', addTodo)
+        document.getElementById('goalBtn')
+            .addEventListener('click', addGoal)
     </script>
 </body>
 
