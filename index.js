@@ -1,35 +1,3 @@
-{
-    type: 'ADD_TODO',
-        todo: {
-        id: 0,
-            name: 'Learn Redux',
-                complete: false,
-    }
-}
-
-{
-    type: 'REMOVE_TODO',
-        id: 0,
-}
-
-{
-    type: 'TOGGLE_TODO',
-        id: 0,
-}
-
-{
-    type: 'ADD_GOAL',
-        goal: {
-        id: 0,
-            name: 'Run a marathon',
-    }
-}
-
-{
-    type: 'REMOVE_GOAL',
-        id: 0,
-}
-
 /*
     Characteristics of a pure function
     1. The always return the same results if the same arguments are passed in.
@@ -53,6 +21,30 @@ function todos(state = [], action) {
     }
 }
 
+function goals(state = [], action) {
+    switch (action.type) {
+        case 'ADD_GOAL':
+            return state.concat([goal.action])
+        case 'REMOVE_GOAL':
+            return state.filter((goal) => goal.id !== action.id)
+        default:
+            state
+    }
+}
+
+function app(state = {}, action) {
+    return {
+        todos: todos(state.todos, action),
+        goals: goals(state.goals, action)
+    }
+}
+
+/*
+    {
+        todos: [],
+        goals: []
+    }
+*/
 function createStore(reducer) {
     // The store should have four parts
     // 1. The state
@@ -87,7 +79,7 @@ function createStore(reducer) {
     }
 }
 
-const store = createStore(todos)
+const store = createStore(app)
 
 store.dispatch({
     type: 'ADD_TODO',
